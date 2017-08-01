@@ -1,7 +1,10 @@
 class StairTool
 require 'sketchup'
+<<<<<<< HEAD
 #fix
+=======
 ##sta
+>>>>>>> sta
 Sketchup.send_action "showRubyPanel:"
 UI.menu("PlugIns").add_item("Draw stairs") {
 #sta
