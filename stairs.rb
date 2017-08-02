@@ -1,5 +1,6 @@
 class StairTool
-require 'sketchup'
+#master
+	require 'sketchup'
 #fix
 ##sta
 #master
