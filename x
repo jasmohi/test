@@ -1,0 +1,48 @@
+[33mcommit 189e3bd5ec5d30db25f2e461bfa5b93e798b543e[m[33m ([m[1;36mHEAD -> [m[1;32mfix1[m[33m)[m
+Merge: 2b4ea7f efbc9d8
+Author: jas <jasmohi@rubysketch.com>
+Date:   Wed Aug 2 13:28:31 2017 +1000
+
+    merge from fix2
+
+[33mcommit efbc9d8444f151217abe29bd44452b7d195e490b[m[33m ([m[1;31morigin/fix2[m[33m, [m[1;32morigin[m[33m, [m[1;32mfix2[m[33m)[m
+Author: jas <jasmohi@rubysketch.com>
+Date:   Wed Aug 2 13:26:32 2017 +1000
+
+    fix2
+
+[33mcommit 2b4ea7fbe865665b4e377f74c0086d5e16e7e654[m[33m ([m[1;31morigin/fix1[m[33m)[m
+Author: jas <jasmohi@rubysketch.com>
+Date:   Wed Aug 2 13:25:10 2017 +1000
+
+    fix1.txt
+
+[33mcommit 62977849dbb73ec2d2eb7c167ef8e7c41b672517[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m
+Author: jas <jasmohi@rubysketch.com>
+Date:   Wed Aug 2 13:16:35 2017 +1000
+
+    init
+
+[33mcommit 85735211ca3deb0e3b64c20db90ecbb5f7890ee4[m
+Author: jas <jasmohi@rubysketch.com>
+Date:   Tue Aug 1 18:02:46 2017 +1000
+
+    third master
+
+[33mcommit 4934adf24d8620e9bfe45c7a7a952b3c2bac20fe[m
+Author: jas <jasmohi@rubysketch.com>
+Date:   Tue Aug 1 17:58:29 2017 +1000
+
+    master sec
+
+[33mcommit 1b6c95683092c104829ade2621e4a5994b73cf08[m
+Author: jas <jasmohi@rubysketch.com>
+Date:   Tue Aug 1 17:36:21 2017 +1000
+
+    First fix
+
+[33mcommit cc7fce0886ab87c6485bf40962274f1c16839fc6[m
+Author: jas <jasmohi@rubysketch.com>
+Date:   Tue Aug 1 17:08:39 2017 +1000
+
+    first master
