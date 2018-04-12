@@ -1,19 +1,14 @@
 class StairTool
-#master
 	require 'sketchup'
-#fix
-##sta
-#master
 Sketchup.send_action "showRubyPanel:"
 UI.menu("PlugIns").add_item("Draw stairs") {
-#sta
-prompts = ['Stair Shape: ', 'Stair Direction:', 'Height:', 'Stair Width:', 'Max. Tread Rise:', 'Tread Run:', 'Gap Between Flights:', 'Landing Position(No of Steps):', 
+prompts = ['Stair Shape: ', 'Stair Direction:', 'Height:', 'Stair Width:', 'Max. Tread Rise:', 'Tread Run:', 'Gap Between Flights:', 'Landing Position(No of Steps):',
 'Landing Depth:', 'Waiting Step (none, up or down):', 'Handrail Side (both, none, left or right):', 'Handrail Height:', 'Head Height:']
 
 options = ['S|L|U', 'left|right', '', '', '', '', '', '', '', 'none|up|down', 'both|none|left|right']
 defaults = ['S', 'right', 3300.mm, 1000.mm, 190.mm, 240.mm, 100.mm, 10, 1500.mm, 'none', 'both', 865.mm, 2100.mm]
 inputs = UI.inputbox( prompts, defaults, options, 'Stairway Builder' )
-    
+
 input = {
     stairShape: inputs[0].to_s,
     direction: inputs[1].to_s,
@@ -30,12 +25,12 @@ input = {
     headHeight: inputs[12].to_f
 }
 
-    stairs= (input[:height]/input[:maxrise]).ceil    
+    stairs= (input[:height]/input[:maxrise]).ceil
     rise= ((input[:height]/stairs.mm)).mm
     stairsAfterLandingP= stairs - input[:landingPosition]
 
     Sketchup.active_model.start_operation "Stairs"
-    
+
     model = Sketchup.active_model
     parentGroup =  model.entities.add_group
     entities = parentGroup.entities
@@ -50,7 +45,7 @@ input = {
             entities.add_instance groupDef, t
         }
     end
-    
+
     def transformGroup(point, group)
         t = Geom::Transformation.new point
         group.transform! t
@@ -75,13 +70,13 @@ input = {
             landingStep = entitiesWaitingStep.add_face [0, 0, 0], [(input[:width] * 2) + input[:gapBwFlights], 0, 0], [(input[:width] * 2) + input[:gapBwFlights], input[:landingDepth], 0], [0, input[:landingDepth], 0]
         elsif input[:waitingStep] == 'up'
             landingStep = entitiesWaitingStep.add_face [0, 0, 0], [input[:width] + input[:gapBwFlights], 0, 0], [input[:width] + input[:gapBwFlights], -input[:run], 0], [(input[:width] * 2) + input[:gapBwFlights], -input[:run], 0], [(input[:width] * 2) + input[:gapBwFlights], 0, 0], [(input[:width] * 2) + input[:gapBwFlights], input[:landingDepth], 0], [0, input[:landingDepth], 0]
-        elsif input[:waitingStep] == 'down'  
+        elsif input[:waitingStep] == 'down'
             landingStep = entitiesWaitingStep.add_face [0, 0, 0], [input[:width], 0, 0], [input[:width], input[:run], 0], [(input[:width] * 2) + input[:gapBwFlights], input[:run], 0], [(input[:width] * 2) + input[:gapBwFlights], input[:landingDepth], 0], [0, input[:landingDepth], 0]
         end
         if input[:direction] == 'right'
             x = 0
         else
-            entitiesWaitingStep.transform_entities(Geom::Transformation.rotation(ORIGIN,[0,1,0],(180.degrees)),landingStep) 
+            entitiesWaitingStep.transform_entities(Geom::Transformation.rotation(ORIGIN,[0,1,0],(180.degrees)),landingStep)
             x = input[:width]
         end
         point = Geom::Point3d.new x, (input[:run] * (input[:landingPosition]-1).mm).to_mm, (rise * (input[:landingPosition]-1).mm).to_mm
@@ -89,7 +84,7 @@ input = {
         face = groupWaitingStep.entities.find {
         |a| a.is_a? Sketchup::Face }
         if input[:direction] == 'right' then face.reverse! end
-        face.pushpull rise                   
+        face.pushpull rise
     end
 
     def createStairs(input, stairs, rise, group, groupStairs)
@@ -105,17 +100,17 @@ input = {
         group1.erase!
         return groupDef
     end
-                
+
     # U Shape
     def uShapeStairsAfterLanding(input, group, stairsAfterLandingP, rise, groupDef, groupStairsAftLandingPos)
         entities3 = groupStairsAftLandingPos.entities
         noOfStepsToCreate(input, stairsAfterLandingP, entities3, rise, groupDef)
-        angle = 180 
+        angle = 180
         entities3.transform_entities(Geom::Transformation.rotation(ORIGIN,[0,0,1],(angle.degrees)),groupStairsAftLandingPos)
-        if input[:direction] == 'right' 
+        if input[:direction] == 'right'
             x = (input[:width] * 2) + input[:gapBwFlights]
-        else 
-            x = -input[:gapBwFlights] 
+        else
+            x = -input[:gapBwFlights]
         end
         if input[:waitingStep] == 'none'
             y = (input[:run] * (input[:landingPosition]-1).mm).to_mm
@@ -123,36 +118,36 @@ input = {
             y = (input[:run] * (input[:landingPosition]-2).mm).to_mm
         elsif input[:waitingStep] == 'down'
             y = (input[:run] * (input[:landingPosition]).mm).to_mm
-        end                
+        end
         point = Geom::Point3d.new x, y, (rise * input[:landingPosition].mm).to_mm
         transformGroup(point, groupStairsAftLandingPos)
     end
-    
-    # L Shape 
+
+    # L Shape
     def lShapeStairsAfterLanding(input, group, stairsAfterLandingP, rise, groupDef, groupStairsAftLandingPos)
         entities3 = groupStairsAftLandingPos.entities
         noOfStepsToCreate(input, stairsAfterLandingP, entities3, rise, groupDef)
-             
-        if input[:direction] == 'right' then angle = 270 else angle = 90 end 
+
+        if input[:direction] == 'right' then angle = 270 else angle = 90 end
         entities3.transform_entities(Geom::Transformation.rotation(ORIGIN,[0,0,1],(angle.degrees)),groupStairsAftLandingPos)
-        if input[:direction] == 'right' 
-            x = input[:width] 
-            y = (input[:run] * (input[:landingPosition]+3).mm).to_mm 
-        else 
-            x = 0 
-            y = (input[:run] * (input[:landingPosition]-1).mm).to_mm  
-        end 
+        if input[:direction] == 'right'
+            x = input[:width]
+            y = (input[:run] * (input[:landingPosition]+3).mm).to_mm
+        else
+            x = 0
+            y = (input[:run] * (input[:landingPosition]-1).mm).to_mm
+        end
         point = Geom::Point3d.new x, y, (rise * input[:landingPosition].mm).to_mm
         transformGroup(point, groupStairsAftLandingPos)
     end
- 
+
 #Creating Stairs
  groupDef = createStairs(input, stairs, rise, parentGroup, groupStairs)
  if input[:stairShape] == 'L'
-    lShapeStairsAfterLanding(input, parentGroup, stairsAfterLandingP, rise, groupDef, groupStairsAftLandingPos) 
-    lShapeWaitingStep(input, rise, parentGroup)    
+    lShapeStairsAfterLanding(input, parentGroup, stairsAfterLandingP, rise, groupDef, groupStairsAftLandingPos)
+    lShapeWaitingStep(input, rise, parentGroup)
  elsif input[:stairShape] == 'U'
-    uShapeStairsAfterLanding(input, parentGroup, stairsAfterLandingP, rise, groupDef, groupStairsAftLandingPos) 
+    uShapeStairsAfterLanding(input, parentGroup, stairsAfterLandingP, rise, groupDef, groupStairsAftLandingPos)
     uShapeWaitingStep(input, rise, parentGroup)
  end
 
@@ -162,7 +157,7 @@ def explodeGroup(group, isStairs)
         entityArray.each {
         |i| i.explode
         }
-    end    
+    end
     return entityArray
 end
 
@@ -214,12 +209,12 @@ def createLinesAfterWaitingStep(input, rise, group, stairsAfterLandingP, parentG
     entitiesLines1 = groupLines1.entities
     line1_1 = entitiesLines1.add_line point0, point1, point2, point3
     if input[:stairShape] == 'U'
-        if input[:direction] == 'right' 
+        if input[:direction] == 'right'
             x = (input[:width] * 2) + input[:gapBwFlights]
             x1 = input[:width] + input[:gapBwFlights]
-        else 
+        else
             x = -(input[:width] + input[:gapBwFlights])
-            x1 = -input[:gapBwFlights] 
+            x1 = -input[:gapBwFlights]
         end
         if input[:waitingStep] == 'none'
             y = y1 = (input[:run] * (input[:landingPosition]-1).mm).to_mm
@@ -227,20 +222,20 @@ def createLinesAfterWaitingStep(input, rise, group, stairsAfterLandingP, parentG
             y = y1 = (input[:run] * (input[:landingPosition]-2).mm).to_mm
         elsif input[:waitingStep] == 'down'
             y = y1 = (input[:run] * (input[:landingPosition]).mm).to_mm
-        end  
+        end
     else
         y = (input[:run] * (input[:landingPosition]-1).mm).to_mm + input[:width]
         y1 = (input[:run] * (input[:landingPosition]-1).mm).to_mm
         if input[:direction] == 'right' then angle = 90 else angle = 270 end
         entitiesLines.transform_entities(Geom::Transformation.rotation(ORIGIN,[0,0,1],(angle.degrees)),group)
         entitiesLines1.transform_entities(Geom::Transformation.rotation(ORIGIN,[0,0,1],(angle.degrees)),groupLines1)
-        
-        if input[:direction] == 'right' 
+
+        if input[:direction] == 'right'
             x = x1 = input[:width]
-        else 
+        else
             x = x1 = 0
         end
-    end              
+    end
     point = Geom::Point3d.new x, y, (rise * (input[:landingPosition]-1).mm).to_mm
     transformGroup(point, group)
     point1 = Geom::Point3d.new x1, y1, (rise * (input[:landingPosition]-1).mm).to_mm
@@ -270,31 +265,31 @@ end
 
 def createEdgesAfterWaitingStep(input, rise, entities, stairsAfterLandingP)
     if input[:stairShape] == 'U'
-        if input[:direction] == 'right' 
+        if input[:direction] == 'right'
             x = x2 = (input[:width] * 2) + input[:gapBwFlights]
             x1 = x3 = input[:width] + input[:gapBwFlights]
-        else 
+        else
             x = x2 = -(input[:width] + input[:gapBwFlights])
-            x1 = x3 = -input[:gapBwFlights] 
+            x1 = x3 = -input[:gapBwFlights]
         end
         if input[:waitingStep] == 'none'
             y = y2 = (input[:run] * (input[:landingPosition]-1).mm).to_mm
-            y1 = y3 = (input[:run] * (input[:landingPosition] - (stairsAfterLandingP+1)).mm).to_mm    
+            y1 = y3 = (input[:run] * (input[:landingPosition] - (stairsAfterLandingP+1)).mm).to_mm
         elsif input[:waitingStep] == 'up'
             y = y2 = (input[:run] * (input[:landingPosition]-2).mm).to_mm
-            y1 = y3 = (input[:run] * (input[:landingPosition] - (stairsAfterLandingP+2)).mm).to_mm    
+            y1 = y3 = (input[:run] * (input[:landingPosition] - (stairsAfterLandingP+2)).mm).to_mm
         elsif input[:waitingStep] == 'down'
             y = y2 = (input[:run] * (input[:landingPosition]).mm).to_mm
             y1 = y3 = (input[:run] * (input[:landingPosition] - (stairsAfterLandingP)).mm).to_mm
-            
-        end   
-    elsif 
+
+        end
+    elsif
         y = y1 =  (input[:run] * (input[:landingPosition]-1).mm).to_mm
         y2 = y3 = (input[:run] * (input[:landingPosition]-1).mm).to_mm + input[:width]
-        if input[:direction] == 'right' 
+        if input[:direction] == 'right'
             x = x1 = input[:width]
             x2 = x3 = input[:width] + (input[:run] * stairsAfterLandingP.mm).to_mm
-        else 
+        else
             x = x1 = 0
             x2 = x3 = -(input[:run] * stairsAfterLandingP.mm).to_mm
         end
@@ -369,7 +364,7 @@ def createHandRails(input, rise, stairs, stairsAfterLandingP, parentGroup)
         if input[:direction] == 'right'
 		    if input[:handRailSide] == 'both'
 			    line = entities2.add_line point3, point4
-			    line = entities2.add_line point1, point2, point16, point17, point18 
+			    line = entities2.add_line point1, point2, point16, point17, point18
 			    line = entities2.add_line point19, point20
 		    elsif input[:handRailSide] == 'left'
 			    line = entities2.add_line point1, point2, point16, point17, point18
@@ -380,13 +375,13 @@ def createHandRails(input, rise, stairs, stairsAfterLandingP, parentGroup)
 	    else
 		    if input[:handRailSide] == 'both'
 			    line = entities2.add_line point1, point2
-    			line = entities2.add_line point3, point4, point16, point16, point17, point18  
+    			line = entities2.add_line point3, point4, point16, point16, point17, point18
 	    		line = entities2.add_line point19, point20
 		    elsif input[:handRailSide] == 'left'
 			    line = entities2.add_line point1, point2
     			line = entities2.add_line point19, point20
 	    	elsif input[:handRailSide] == 'right'
-		    	line = entities2.add_line point3, point4, point16, point16, point17, point18  
+		    	line = entities2.add_line point3, point4, point16, point16, point17, point18
 		    end
 	    end
 
@@ -405,13 +400,13 @@ def createHandRails(input, rise, stairs, stairsAfterLandingP, parentGroup)
             x2 = -(input[:width] + input[:gapBwFlights])
             x3 = -input[:gapBwFlights]
         end
-        
+
         if input[:waitingStep] == 'none'
             y1 = y0 + input[:landingDepth]
             y2 = y0 + input[:run]
             y3 = input[:run] * (input[:landingPosition] - (stairsAfterLandingP + 1))
             y4 = y0
-        
+
         elsif input[:waitingStep] == 'up'
             y1 = y0 + input[:landingDepth]
             y2 = y0
@@ -428,7 +423,7 @@ def createHandRails(input, rise, stairs, stairsAfterLandingP, parentGroup)
 		point18 = Geom::Point3d.new(x2, y2, (rise * input[:landingPosition])  + input[:handRailHeight])
 		point19 = Geom::Point3d.new(x2, y3, (rise * input[:landingPosition]) + (rise * (stairsAfterLandingP+1))  + input[:handRailHeight])
 		point20 = Geom::Point3d.new(x3, y4, (rise * input[:landingPosition]) + rise + input[:handRailHeight])
-        point21 = Geom::Point3d.new(x3, y3, (rise * input[:landingPosition]) + (rise * (stairsAfterLandingP+1)) + input[:handRailHeight])		
+        point21 = Geom::Point3d.new(x3, y3, (rise * input[:landingPosition]) + (rise * (stairsAfterLandingP+1)) + input[:handRailHeight])
         pointu = Geom::Point3d.new(x2, y4, (rise * input[:landingPosition]) + rise + input[:handRailHeight])
 		if input[:direction] == 'right'
 			if input[:handRailSide] == 'both'
@@ -438,11 +433,11 @@ def createHandRails(input, rise, stairs, stairsAfterLandingP, parentGroup)
 			elsif input[:handRailSide] == 'left'
 				line = entities2.add_line point1, point2, point16, point17, point18, point19
 			elsif input[:handRailSide] == 'right'
-				line = entities2.add_line point3, point4 
+				line = entities2.add_line point3, point4
 				pointu = Geom::Point3d.new(input[:width] + input[:width] + input[:gapBwFlights], y2, (rise * input[:landingPosition]) + rise + input[:handRailHeight])
                 line = entities2.add_line pointu, point19
 			end
-		else	
+		else
 			if input[:handRailSide] == 'both'
 				line = entities2.add_line point1, point2
 				line = entities2.add_line point3, point4, point16, point17, point18, point19
@@ -471,14 +466,14 @@ def createHeadHeight(input, rise, stairs, stairsAfterLandingP, parentGroup)
 	    entities3.add_face [0, y2, (rise * input[:landingPosition]) + input[:headHeight]], [0, y2 + input[:width], (rise * input[:landingPosition]) + input[:headHeight]], [input[:width], y2 + input[:width], (rise * input[:landingPosition]) + input[:headHeight]], [input[:width], y2, (rise * input[:landingPosition]) + input[:headHeight]]
         if input[:direction] == 'right'
             x1 = input[:width]
-            x2 = input[:width] + (stairsAfterLandingP * input[:run]) 
+            x2 = input[:width] + (stairsAfterLandingP * input[:run])
         else
             x1 = 0
             x2 = -(stairsAfterLandingP * input[:run])
         end
         entities3.add_face [x1, y2 + input[:width], (rise * input[:landingPosition]) + rise + input[:headHeight]], [x1, y2, (rise * input[:landingPosition]) + rise + input[:headHeight]], [x2, y2, (rise * input[:landingPosition]) + (rise * (stairsAfterLandingP+1)) + input[:headHeight]], [x2, y2 + input[:width], (rise * input[:landingPosition]) + (rise * (stairsAfterLandingP+1)) + input[:headHeight]]
 
-    elsif input[:stairShape] == 'U'	
+    elsif input[:stairShape] == 'U'
         y2 = input[:run] * (input[:landingPosition]  - 1)
         entities3.add_face [0, 0, rise + input[:headHeight]], [input[:width], 0, rise + input[:headHeight]], [input[:width], y2, (rise * input[:landingPosition]) + input[:headHeight]], [0, y2, (rise * input[:landingPosition]) + input[:headHeight]]
         if input[:direction] == 'right'
@@ -499,9 +494,9 @@ def createHeadHeight(input, rise, stairs, stairsAfterLandingP, parentGroup)
             entities3.add_face [x1, y2, (rise * input[:landingPosition]) + input[:headHeight]], [x1, y2 + input[:landingDepth], (rise * input[:landingPosition]) + input[:headHeight]], [x3 , y2 + input[:landingDepth], (rise * input[:landingPosition]) + input[:headHeight]], [x3, y2 - input[:run], (rise * input[:landingPosition]) + input[:headHeight]], [x2, y2 - input[:run], (rise * input[:landingPosition]) + input[:headHeight]], [x2, y2 , (rise * input[:landingPosition]) + input[:headHeight]], [x1, y2, (rise * input[:landingPosition]) + input[:headHeight]]
             entities3.add_face [x2, y2 - input[:run], (rise * input[:landingPosition]) +rise+ input[:headHeight]], [x3, y2 - input[:run], (rise * input[:landingPosition]) +rise+ input[:headHeight]], [x3, input[:run] * (input[:landingPosition] - (stairsAfterLandingP + 2)), (rise * input[:landingPosition]) + (rise * (stairsAfterLandingP+1)) + input[:headHeight]], [x2, input[:run] * (input[:landingPosition] - (stairsAfterLandingP + 2)), (rise * input[:landingPosition]) + (rise * (stairsAfterLandingP+1)) + input[:headHeight]]
 	    elsif input[:waitingStep] == 'down'
-            entities3.add_face [x1, y2, (rise * input[:landingPosition]) + input[:headHeight]], [x1, y2 + input[:landingDepth], (rise * input[:landingPosition]) + input[:headHeight]], [x3 , y2 + input[:landingDepth], (rise * input[:landingPosition]) + input[:headHeight]], [x3, y2 + input[:run], (rise * input[:landingPosition]) + input[:headHeight]], [x4, y2 + input[:run], (rise * input[:landingPosition]) + input[:headHeight]], [x4, y2, (rise * input[:landingPosition]) + input[:headHeight]]         
+            entities3.add_face [x1, y2, (rise * input[:landingPosition]) + input[:headHeight]], [x1, y2 + input[:landingDepth], (rise * input[:landingPosition]) + input[:headHeight]], [x3 , y2 + input[:landingDepth], (rise * input[:landingPosition]) + input[:headHeight]], [x3, y2 + input[:run], (rise * input[:landingPosition]) + input[:headHeight]], [x4, y2 + input[:run], (rise * input[:landingPosition]) + input[:headHeight]], [x4, y2, (rise * input[:landingPosition]) + input[:headHeight]]
             entities3.add_face [x2, y2+input[:run], (rise * input[:landingPosition])+rise + input[:headHeight]], [x3, y2+input[:run], (rise * input[:landingPosition])+rise + input[:headHeight]], [x3, input[:run] * (input[:landingPosition] - (stairsAfterLandingP)), (rise * input[:landingPosition]) + (rise * (stairsAfterLandingP+1)) + input[:headHeight]], [x2, input[:run] * (input[:landingPosition] - (stairsAfterLandingP)), (rise * input[:landingPosition]) + (rise * (stairsAfterLandingP+1)) + input[:headHeight]]
-        end 
+        end
     end
 end
 
@@ -510,6 +505,6 @@ if input[:handRailSide] != 'none'
 end
 createHeadHeight(input, rise, stairs, stairsAfterLandingP, parentGroup)
 
-Sketchup.active_model.commit_operation  
+Sketchup.active_model.commit_operation
 }
 end
