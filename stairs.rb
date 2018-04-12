@@ -1,5 +1,6 @@
 class StairTool
-	require 'sketchup'
+  require 'sketchup'
+  #change in feature
 Sketchup.send_action "showRubyPanel:"
 UI.menu("PlugIns").add_item("Draw stairs") {
 prompts = ['Stair Shape: ', 'Stair Direction:', 'Height:', 'Stair Width:', 'Max. Tread Rise:', 'Tread Run:', 'Gap Between Flights:', 'Landing Position(No of Steps):',
