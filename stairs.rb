@@ -1,6 +1,5 @@
 class StairTool
   require 'sketchup'
-  #change in feature
 Sketchup.send_action "showRubyPanel:"
 UI.menu("PlugIns").add_item("Draw stairs") {
 prompts = ['Stair Shape: ', 'Stair Direction:', 'Height:', 'Stair Width:', 'Max. Tread Rise:', 'Tread Run:', 'Gap Between Flights:', 'Landing Position(No of Steps):',
@@ -9,7 +8,7 @@ prompts = ['Stair Shape: ', 'Stair Direction:', 'Height:', 'Stair Width:', 'Max.
 options = ['S|L|U', 'left|right', '', '', '', '', '', '', '', 'none|up|down', 'both|none|left|right']
 defaults = ['S', 'right', 3300.mm, 1000.mm, 190.mm, 240.mm, 100.mm, 10, 1500.mm, 'none', 'both', 865.mm, 2100.mm]
 inputs = UI.inputbox( prompts, defaults, options, 'Stairway Builder' )
-
+#change in feature
 input = {
     stairShape: inputs[0].to_s,
     direction: inputs[1].to_s,
